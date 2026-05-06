@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Development WhatsApp Class</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#EFF6FF',
+              100: '#DBEAFE',
+              200: '#BFDBFE',
+              300: '#93C5FD',
+              400: '#60A5FA',
+              500: '#3B82F6',
+              600: '#2563EB',
+              700: '#1D4ED8',
+              800: '#1E40AF',
+              900: '#1E3A8A',
+            },
+            whatsapp: '#25D366',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; }
+
+    /* Fade-up animation */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger children */
+    .stagger > .fade-up:nth-child(1) { transition-delay: 0.05s; }
+    .stagger > .fade-up:nth-child(2) { transition-delay: 0.15s; }
+    .stagger > .fade-up:nth-child(3) { transition-delay: 0.25s; }
+    .stagger > .fade-up:nth-child(4) { transition-delay: 0.35s; }
+    .stagger > .fade-up:nth-child(5) { transition-delay: 0.45s; }
+    .stagger > .fade-up:nth-child(6) { transition-delay: 0.55s; }
+
+    /* CTA pulse ring */
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      border: 2px solid currentColor;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+
+    /* Floating WhatsApp button */
+    @keyframes float-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .float-btn {
+      animation: float-bounce 3s ease-in-out infinite;
+    }
+
+    /* Hero background pattern */
+    .hero-pattern {
+      background-image: radial-gradient(circle at 20% 50%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                         radial-gradient(circle at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                         radial-gradient(circle at 60% 80%, rgba(59,130,246,0.05) 0%, transparent 50%);
+    }
+
+    /* Card hover */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(59,130,246,0.12);
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 antialiased">
+
+  <!-- ========== NAVBAR ========== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-primary-100/50 transition-all duration-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-14 sm:h-16">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+            <i data-lucide="code-2" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="font-bold text-gray-900 text-sm sm:text-base"> Promise Designs WebDev Class</span>
+        </a>
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-6">
+          <a href="#learn" class="text-sm text-gray-600 hover:text-primary-600 transition-colors">Curriculum</a>
+          <a href="#details" class="text-sm text-gray-600 hover:text-primary-600 transition-colors">Details</a>
+          <a href="#why" class="text-sm text-gray-600 hover:text-primary-600 transition-colors">Why Join</a>
+          <a href="https://forms.gle/GZzM9EsQ9Ec1jciL8" target="_blank" class="inline-flex items-center gap-2 bg-primary-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-primary-600 transition-colors">
+            Join Now
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+        <!-- Mobile Hamburger -->
+        <button id="menuBtn" class="md:hidden p-2 text-gray-700" aria-label="Menu">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 w-64 bg-white shadow-2xl z-[60] p-6 flex flex-col gap-6">
+    <button id="closeMenu" class="self-end p-2 text-gray-600" aria-label="Close Menu">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <a href="#learn" class="text-gray-700 font-medium hover:text-primary-600 transition-colors mobile-link">Curriculum</a>
+    <a href="#details" class="text-gray-700 font-medium hover:text-primary-600 transition-colors mobile-link">Details</a>
+    <a href="#why" class="text-gray-700 font-medium hover:text-primary-600 transition-colors mobile-link">Why Join</a>
+    <a href="https://forms.gle/GZzM9EsQ9Ec1jciL8" target="_blank" class="mt-4 bg-primary-500 text-white font-semibold text-center px-5 py-3 rounded-full hover:bg-primary-600 transition-colors mobile-link">Join Now</a>
+  </div>
+  <div id="menuOverlay" class="fixed inset-0 bg-black/30 z-[55] hidden"></div>
+
+  <!-- ========== HERO SECTION ========== -->
+  <section class="hero-pattern pt-24 pb-16 sm:pt-32 sm:pb-24 px-4 sm:px-6">
+    <div class="max-w-3xl mx-auto text-center">
+      <!-- Badge -->
+      <div class="fade-up inline-flex items-center gap-2 bg-primary-50 text-primary-700 text-xs sm:text-sm font-semibold px-4 py-2 rounded-full mb-6 sm:mb-8">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        WhatsApp-Based Learning
+      </div>
+
+      <!-- Headline -->
+      <h1 class="fade-up text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight mb-4 sm:mb-6">
+        Learn Web Development<br>
+        <span class="text-primary-500">(Phone or Laptop)</span>
+      </h1>
+
+      <!-- Subtext -->
+      <p class="fade-up text-base sm:text-lg text-gray-600 max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+        Join a step-by-step WhatsApp class and learn <strong class="text-gray-800">HTML, CSS &amp; JavaScript</strong> from scratch.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="fade-up flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6">
+        <a href="https://forms.gle/GZzM9EsQ9Ec1jciL8" target="_blank" class="relative pulse-ring inline-flex items-center justify-center gap-2 bg-primary-500 text-white font-bold text-base sm:text-lg px-8 py-3.5 rounded-full hover:bg-primary-600 active:scale-95 transition-all">
+          Join Now
+          <p class="text-sm text-gray-600">
+  🚀 Class starts in:
+</p>
+  <p id="countdown" class="text-lg font-bold text-primary-600 mt-1">
+    Loading...
+  </p>
+  <p class="text-xs text-gray-500 mt-2">
+    Only <span class="font-semibold text-gray-700">30 students</span> will be accepted for proper guidance
+  </p>
+</div>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+        <a href="https://wa.me/message/PHMXWGR4L2HPM1" target="_blank" class="inline-flex items-center justify-center gap-2 bg-whatsapp text-white font-semibold text-base sm:text-lg px-8 py-3.5 rounded-full hover:brightness-110 active:scale-95 transition-all">
+          <i data-lucide="message-circle" class="w-5 h-5"></i>
+          Chat on WhatsApp
+        </a>
+      </div>
+
+      <!-- Note -->
+      <p class="fade-up flex items-center justify-center gap-2 text-sm text-gray-500">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+        No experience needed
+      </p>
+
+      <!-- Quick Stats -->
+      <div class="fade-up mt-10 sm:mt-14 grid grid-cols-3 gap-4 max-w-md mx-auto">
+        <div class="bg-primary-50/60 rounded-2xl p-4 text-center">
+          <p class="text-xl sm:text-2xl font-bold text-primary-600">2</p>
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">Months</p>
+        </div>
+        <div class="bg-primary-50/60 rounded-2xl p-4 text-center">
+          <p class="text-xl sm:text-2xl font-bold text-primary-600">3</p>
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">Days/Week</p>
+        </div>
+        <div class="bg-primary-50/60 rounded-2xl p-4 text-center">
+          <p class="text-xl sm:text-2xl font-bold text-primary-600">0</p>
+          <p class="text-xs sm:text-sm text-gray-600 mt-1">Experience Req.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WHAT YOU'LL LEARN ========== -->
+  <section id="learn" class="py-16 sm:py-24 px-4 sm:px-6 bg-gray-50/70">
+    <div class="max-w-5xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-10 sm:mb-14">
+        <div class="fade-up inline-flex items-center gap-2 text-primary-500 font-semibold text-sm mb-3">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          CURRICULUM
+        </div>
+        <h2 class="fade-up text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">What You'll Learn</h2>
+        <p class="fade-up text-gray-500 mt-3 max-w-md mx-auto">A structured path from zero to building your own website.</p>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="globe" class="w-6 h-6 text-primary-500"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">How Websites Work</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Understand the basics of the web — domains, hosting, browsers, and how pages load.</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="file-code" class="w-6 h-6 text-orange-500"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">HTML — Structure</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Learn to build the skeleton of any webpage with semantic HTML elements and proper structure.</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="palette" class="w-6 h-6 text-sky-500"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">CSS — Design &amp; Responsiveness</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Style your pages with colors, layouts, flexbox, grid, and make them look great on any screen.</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="zap" class="w-6 h-6 text-yellow-500"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">JavaScript — Interactivity</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Add logic and interaction to your websites — buttons, forms, dynamic content, and more.</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="upload-cloud" class="w-6 h-6 text-green-500"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Build &amp; Host a Website</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Deploy your project to the web for free — learn hosting, domains, and going live.</p>
+        </div>
+
+        <!-- Bonus Card -->
+        <div class="fade-up card-hover bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-6 text-white shadow-lg">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+            <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="font-bold mb-2">Real Project</h3>
+          <p class="text-sm text-white/80 leading-relaxed">Build a complete website from scratch as your final project — portfolio or landing page.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CLASS DETAILS ========== -->
+  <section id="details" class="py-16 sm:py-24 px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-10 sm:mb-14">
+        <div class="fade-up inline-flex items-center gap-2 text-primary-500 font-semibold text-sm mb-3">
+          <i data-lucide="info" class="w-4 h-4"></i>
+          CLASS INFO
+        </div>
+        <h2 class="fade-up text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Class Details</h2>
+        <p class="fade-up text-gray-500 mt-3 max-w-md mx-auto">Everything you need to know before you start.</p>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="stagger grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 mx-auto bg-primary-50 rounded-xl flex items-center justify-center mb-3">
+            <i data-lucide="calendar-days" class="w-6 h-6 text-primary-500"></i>
+          </div>
+          <p class="text-2xl sm:text-3xl font-extrabold text-gray-900">2</p>
+          <p class="text-sm text-gray-500 mt-1">Months Duration</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 mx-auto bg-violet-50 rounded-xl flex items-center justify-center mb-3">
+            <i data-lucide="clock" class="w-6 h-6 text-violet-500"></i>
+          </div>
+          <p class="text-2xl sm:text-3xl font-extrabold text-gray-900">3<span class="text-lg">d</span>/5<span class="text-lg">h</span></p>
+          <p class="text-sm text-gray-500 mt-1">3 Days/Week, 5 Hrs/Day</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 mx-auto bg-green-50 rounded-xl flex items-center justify-center mb-3">
+            <i data-lucide="message-circle" class="w-6 h-6 text-green-500"></i>
+          </div>
+          <p class="text-lg sm:text-xl font-extrabold text-gray-900">WhatsApp</p>
+          <p class="text-sm text-gray-500 mt-1">Learn via Chat</p>
+        </div>
+
+        <div class="fade-up card-hover bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm text-center">
+          <div class="w-12 h-12 mx-auto bg-sky-50 rounded-xl flex items-center justify-center mb-3">
+            <i data-lucide="smartphone" class="w-6 h-6 text-sky-500"></i>
+          </div>
+          <p class="text-lg sm:text-xl font-extrabold text-gray-900">Phone/Laptop</p>
+          <p class="text-sm text-gray-500 mt-1">Either Works!</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WHY JOIN ========== -->
+  <section id="why" class="py-16 sm:py-24 px-4 sm:px-6 bg-gray-50/70">
+    <div class="max-w-5xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-10 sm:mb-14">
+        <div class="fade-up inline-flex items-center gap-2 text-primary-500 font-semibold text-sm mb-3">
+          <i data-lucide="star" class="w-4 h-4"></i>
+          BENEFITS
+        </div>
+        <h2 class="fade-up text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Why Join?</h2>
+        <p class="fade-up text-gray-500 mt-3 max-w-md mx-auto">This class is built for beginners — no tech jargon, just real learning.</p>
+      </div>
+
+      <!-- Benefits Grid -->
+      <div class="stagger grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto">
+
+        <div class="fade-up card-hover flex items-start gap-4 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm">
+          <div class="flex-shrink-0 w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-primary-500"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">Simple Explanations</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Beginner-friendly language — no confusing tech jargon.</p>
+          </div>
+        </div>
+
+        <div class="fade-up card-hover flex items-start gap-4 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm">
+          <div class="flex-shrink-0 w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="pencil-line" class="w-5 h-5 text-orange-500"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">Practical Assignments</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Hands-on practice after every lesson to reinforce learning.</p>
+          </div>
+        </div>
+
+        <div class="fade-up card-hover flex items-start gap-4 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm">
+          <div class="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="folder-open" class="w-5 h-5 text-green-500"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">Real Project Guidance</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Build an actual website from start to finish with guidance.</p>
+          </div>
+        </div>
+
+        <div class="fade-up card-hover flex items-start gap-4 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm">
+          <div class="flex-shrink-0 w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="life-buoy" class="w-5 h-5 text-violet-500"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">Support When Stuck</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Ask questions anytime — get help directly on WhatsApp.</p>
+            <p class="text-sm text-gray-500 mt-4">
+  Taught by an experienced web developer with real client projects.
+</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CALL TO ACTION ========== -->
+  <section id="cta" class="py-16 sm:py-24 px-4 sm:px-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="fade-up relative bg-gradient-to-br from-primary-500 to-primary-700 rounded-3xl p-8 sm:p-12 text-center text-white overflow-hidden">
+        <!-- Decorative circles -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full"></div>
+        <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full"></div>
+
+        <div class="relative z-10">
+          <div class="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-2xl mb-6">
+            <i data-lucide="rocket" class="w-7 h-7 text-white"></i>
+          </div>
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+            Ready to start your web development journey?
+          </h2>
+          <p class="text-white/80 max-w-md mx-auto mb-8 leading-relaxed">
+            Don't wait — limited slots available. Apply now and start building websites from scratch.
+            <p class="text-sm text-white/80 mt-3">
+  Affordable fee — details after application
+</p>
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="https://forms.gle/GZzM9EsQ9Ec1jciL8" target="_blank" class="inline-flex items-center justify-center gap-2 bg-white text-primary-600 font-bold text-base px-8 py-3.5 rounded-full hover:bg-gray-100 active:scale-95 transition-all shadow-lg">
+              Secure your Spot
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+            <a href="https://wa.me/message/PHMXWGR4L2HPM1" target="_blank" class="inline-flex items-center justify-center gap-2 bg-white/15 text-white font-semibold text-base px-8 py-3.5 rounded-full hover:bg-white/25 active:scale-95 transition-all border border-white/20">
+              <i data-lucide="message-circle" class="w-5 h-5"></i>
+              Ask a Question
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="bg-gray-900 text-white pt-10 pb-6 px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <!-- Urgency -->
+      <div class="fade-up inline-flex items-center gap-2 bg-red-500/15 text-red-400 text-sm font-semibold px-4 py-2 rounded-full mb-6">
+        <i data-lucide="flame" class="w-4 h-4"></i>
+        Limited slots available — enroll now!
+      </div>
+
+      <!-- Contact -->
+      <div class="fade-up mb-6">
+        <a href="https://wa.me/message/PHMXWGR4L2HPM1" target="_blank" class="inline-flex items-center gap-2 text-whatsapp hover:brightness-110 transition font-medium">
+          <i data-lucide="message-circle" class="w-5 h-5"></i>
+          Chat on WhatsApp
+        </a>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-gray-800 my-6"></div>
+
+      <!-- Branding -->
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="w-6 h-6 bg-primary-500 rounded-md flex items-center justify-center">
+          <i data-lucide="code-2" class="w-3.5 h-3.5 text-white"></i>
+        </div>
+        <span class="font-bold text-sm">Promise Designs WebDev WhatsApp Class</span>
+      </div>
+      <p class="text-xs text-gray-500">Promising the Best.</p>
+    </div>
+  </footer>
+
+  <!-- ========== FLOATING WHATSAPP BUTTON ========== -->
+  <a href="https://wa.me/message/PHMXWGR4L2HPM1" target="_blank" class="float-btn fixed bottom-5 right-5 z-50 w-14 h-14 bg-whatsapp rounded-full flex items-center justify-center shadow-lg hover:brightness-110 active:scale-95 transition-all" aria-label="Chat on WhatsApp">
+    <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
+  </a>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // ---- Mobile Menu ----
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenu = document.getElementById('closeMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    function openMenu() {
+      mobileMenu.classList.add('open');
+      menuOverlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenuFn() {
+      mobileMenu.classList.remove('open');
+      menuOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    closeMenu.addEventListener('click', closeMenuFn);
+    menuOverlay.addEventListener('click', closeMenuFn);
+    mobileLinks.forEach(link => link.addEventListener('click', closeMenuFn));
+
+    // ---- Navbar scroll effect ----
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.scrollY;
+      if (currentScroll > 50) {
+        navbar.classList.add('shadow-md');
+      } else {
+        navbar.classList.remove('shadow-md');
+      }
+      lastScroll = currentScroll;
+    }, { passive: true });
+
+    // ---- Fade-up on scroll (Intersection Observer) ----
+    const fadeEls = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    fadeEls.forEach(el => observer.observe(el));
+    // ---- Smart Countdown (Launch + Deadline) ----
+const countdownEl = document.getElementById('countdown');
+
+// Set dates
+const launchDate = new Date("2026-05-11T09:00:00").getTime(); // Launch date
+const deadline = new Date("2026-05-17T23:59:59").getTime();// Registration ends
+
+function updateCountdown() {
+  const now = new Date().getTime();
+
+  // BEFORE LAUNCH
+  if (now < launchDate) {
+    const distance = launchDate - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+
+    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m`;
+  }
+
+  // AFTER LAUNCH (Registration countdown)
+  else if (now >= launchDate && now < deadline) {
+    const distance = deadline - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((1000 * 60)) % 60;
+
+    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m`;
+
+    // Change text automatically
+    document.querySelector('.text-sm.text-gray-600').innerHTML = "⏳ Registration closes in:";
+  }
+
+  // AFTER DEADLINE
+  else {
+    countdownEl.innerHTML = "Registration Closed";
+  }
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+  </script>
+</body>
+</html>
