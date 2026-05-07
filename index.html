@@ -107,6 +107,34 @@
   </style>
 </head>
 <body class="bg-white text-gray-800 antialiased">
+  <!-- ===== SLOT ALERT POPUP ===== -->
+<div id="slotPopup" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] w-[92%] max-w-md animate-bounce">
+  <div class="bg-primary-600 text-white rounded-2xl shadow-2xl px-5 py-4 flex items-start gap-3 border border-white/10">
+
+    <!-- Icon -->
+    <div class="flex-shrink-0 mt-1">
+      ⚠️
+    </div>
+
+    <!-- Text -->
+    <div class="flex-1">
+      <p class="font-bold text-sm sm:text-base">
+        Few Slots Remaining
+      </p>
+
+      <p class="text-xs sm:text-sm text-white/90 mt-1 leading-relaxed">
+        Over 30+ applications already received.  
+        Only <span class="font-bold text-white">Few slots</span> remaining.
+      </p>
+    </div>
+
+    <!-- Close Button -->
+    <button id="closePopup" class="text-white/80 hover:text-white text-lg font-bold ml-2">
+      ×
+    </button>
+
+  </div>
+</div>
 
   <!-- ========== NAVBAR ========== -->
   <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-primary-100/50 transition-all duration-300">
@@ -571,6 +599,13 @@ function updateCountdown() {
 
 setInterval(updateCountdown, 1000);
 updateCountdown();
+    // ---- Close Popup ----
+const closePopup = document.getElementById('closePopup');
+const slotPopup = document.getElementById('slotPopup');
+
+closePopup.addEventListener('click', () => {
+  slotPopup.style.display = 'none';
+});
   </script>
 </body>
 </html>
